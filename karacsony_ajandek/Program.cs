@@ -6,6 +6,7 @@
         private static List<int> ajandekArList = new List<int>();
         private static List<string> ajandekKategoriaList = new List<string>();
         private static int koltsegvetes;
+        private static int elkoltott;
         static void Main(string[] args)
         {
 
@@ -14,7 +15,7 @@
             koltsegvetes=Convert.ToInt32(Console.ReadLine());
             while (fut)
             {
-                Console.WriteLine("\t1. Ajándék hozzáadása\n\t2. Ajándék szerkesztése\n\t3. Ajándék eltávolítása\n\t5. Ajándéklista megtekintése\n\t6. Ajándékok kategorizálása\n\t7. Kosár statisztika\n\t8. Legdr. és legolcsóbb ajándék");
+                Console.WriteLine("\t1. Ajándék hozzáadása\n\t2. Ajándék szerkesztése\n\t3. Ajándék eltávolítása\n\t5. Ajándéklista megtekintése\n\t5. Ajándékok kategorizálása\n\t6. Kosár statisztika\n\t7. Legdr. és legolcsóbb ajándék");
                 Console.Write("Kérlek add meg az opciót: ");
                 int beker=Convert.ToInt32(Console.ReadLine());
                 switch (beker)
@@ -29,7 +30,17 @@
                         RemoveGift();
                         break;
                     case 4:
-
+                        ViewGifts(); 
+                       break;
+                    case 5:
+                        CategorizeGifts();
+                        break;
+                    case 6:
+                        ViewStatistics();
+                        break;
+                    case 7:
+                        MostExpMostCheap();
+                        break;
                 }
             }
         }
@@ -50,6 +61,14 @@
                     {
                         Console.Write("Add meg az ajándék árát: ");
                         int arBeker = Convert.ToInt32(Console.ReadLine());
+                        if (ajandekArList.Sum() >= 0.9m * koltsegvetes)
+                        {
+                            Console.WriteLine("Figyelem: Az elköltött összeg elérte a költségvetés 90%-át!");
+                        }
+                        if (ajandekArList.Sum()>koltsegvetes)
+                        {
+                            throw new Exception("Nem adható hozzá több ajándék, mivel átlépte a költségvetést.");
+                        }
                         if (arBeker < 0)
                         {
                             throw new Exception("Az ár nem lehet negatív.");
@@ -102,6 +121,14 @@
                 string bekerNev = Console.ReadLine();
                 Console.Write("Új ár: ");
                 int bekerAr=Convert.ToInt32(Console.ReadLine());
+                if (ajandekArList.Sum() >= 0.9m * koltsegvetes)
+                {
+                    Console.WriteLine("Figyelem: Az elköltött összeg elérte a költségvetés 90%-át!");
+                }
+                if (ajandekArList.Sum() > koltsegvetes)
+                {
+                    throw new Exception("Nem adható hozzá több ajándék, mivel átlépte a költségvetést.");
+                }
                 if (bekerAr<0)
                 {
                     throw new Exception("A szám nem lehet negatív.");
@@ -154,6 +181,57 @@
                 Console.WriteLine($"Hiba: {ex.Message}");
             }
         }
+        static void ViewGifts()
+        {
+            if (ajandekNevList.Count == 0)
+            {
+                Console.WriteLine("Nincsenek ajándékok a listában.");
+                return;
+            }
 
+            Console.WriteLine("Ajándékok:");
+            for (int i = 0; i < ajandekNevList.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {ajandekNevList[i]}");
+            }
+        }
+        static void ViewStatistics()
+        {
+            if (ajandekNevList.Count == 0)
+            {
+                Console.WriteLine("Nincsenek ajándékok a listában.");
+                return;
+            }
+            Console.WriteLine($"Ajándékok száma: {ajandekNevList.Count}");
+            Console.WriteLine($"Összes elköltött pénz: {ajandekArList.Sum()} Ft");
+        }
+        static void MostExpMostCheap()
+        {
+            int legdragabb = 0;
+            int legolcsobb = ajandekArList[0];
+            int termekindex_legdragabb = 0;
+            int termekindex_legolcsobb = 0;
+            for (int i = 0; i < ajandekArList.Count; i++)
+            {
+                if (ajandekArList[i]>legdragabb)
+                {
+                    legdragabb=ajandekArList[i];
+                    termekindex_legdragabb=ajandekArList.IndexOf(legdragabb);
+                }
+            }
+            for (int i = 0; i < ajandekArList.Count; i++)
+            {
+                if (ajandekArList[i]<legolcsobb)
+                {
+                    legolcsobb=ajandekArList[i];
+                    termekindex_legolcsobb = ajandekArList.IndexOf(legolcsobb);
+                }
+            }
+            Console.WriteLine($"Legdrágább ajándék: {ajandekNevList[termekindex_legdragabb]}, {legdragabb} Ft");
+            Console.WriteLine($"Legolcsóbb ajándék: {ajandekNevList[termekindex_legolcsobb]}, {legolcsobb} Ft");
+        }
+        static void CategorizeGifts()
+        {
+        }
     }
 }
