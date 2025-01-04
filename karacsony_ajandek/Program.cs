@@ -52,6 +52,9 @@
                             case 7:
                                 MostExpMostCheap();
                                 break;
+                            default:
+                                Console.WriteLine("Nem megfelelő bemenet.");
+                                break;
                         }
                     }
                     catch (FormatException)
