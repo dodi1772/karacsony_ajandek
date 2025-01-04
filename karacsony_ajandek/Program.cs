@@ -9,45 +9,88 @@
         private static int elkoltott;
         static void Main(string[] args)
         {
-
-            bool fut = true;
-            Console.Write("Add meg a költségvetés értékét: ");
-            koltsegvetes=Convert.ToInt32(Console.ReadLine());
-            while (fut)
+            try
             {
-                Console.WriteLine("\t1. Ajándék hozzáadása\n\t2. Ajándék szerkesztése\n\t3. Ajándék eltávolítása\n\t5. Ajándéklista megtekintése\n\t5. Ajándékok kategorizálása\n\t6. Kosár statisztika\n\t7. Legdr. és legolcsóbb ajándék");
-                Console.Write("Kérlek add meg az opciót: ");
-                int beker=Convert.ToInt32(Console.ReadLine());
-                switch (beker)
+                bool fut = true;
+                Console.Write("Add meg a költségvetés értékét: ");
+                koltsegvetes = Convert.ToInt32(Console.ReadLine());
+                if (koltsegvetes<0)
                 {
-                    case 1:
-                        AddGift();
-                        break;
-                    case 2:
-                        EditGift();
-                        break;
-                    case 3:
-                        RemoveGift();
-                        break;
-                    case 4:
-                        ViewGifts(); 
-                       break;
-                    case 5:
-                        CategorizeGifts();
-                        break;
-                    case 6:
-                        ViewStatistics();
-                        break;
-                    case 7:
-                        MostExpMostCheap();
-                        break;
+                    throw new Exception("A szám nem lehet negatív.");
+                }
+                while (fut)
+                {
+                    try
+                    {
+                        Console.WriteLine("\t1. Ajándék hozzáadása\n\t2. Ajándék szerkesztése\n\t3. Ajándék eltávolítása\n\t5. Ajándéklista megtekintése\n\t5. Ajándékok kategorizálása\n\t6. Kosár statisztika\n\t7. Legdr. és legolcsóbb ajándék");
+                        Console.Write("Kérlek add meg az opciót: ");
+                        int beker = Convert.ToInt32(Console.ReadLine());
+                        if (beker < 0)
+                        {
+                            throw new Exception("A szám nem lehet negatív.");
+                        }
+                        switch (beker)
+                        {
+                            case 1:
+                                AddGift();
+                                break;
+                            case 2:
+                                EditGift();
+                                break;
+                            case 3:
+                                RemoveGift();
+                                break;
+                            case 4:
+                                ViewGifts();
+                                break;
+                            case 5:
+                                CategorizeGifts();
+                                break;
+                            case 6:
+                                ViewStatistics();
+                                break;
+                            case 7:
+                                MostExpMostCheap();
+                                break;
+                        }
+                    }
+                    catch (FormatException)
+                    {
+                        Console.WriteLine("A bemenet formátuma hibás.");
+                    }
+                    catch (OverflowException)
+                    {
+                        Console.WriteLine("Túlment az eszmei határokon.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Hiba: {ex.Message}");
+                    }
+
                 }
             }
+            catch (FormatException)
+            {
+                Console.WriteLine("A bemenet formátuma hibás.");
+            }
+            catch (OverflowException)
+            {
+                Console.WriteLine("Túlment az eszmei határokon.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Hiba: {ex.Message}");
+            }
+
         }
         static void AddGift()
         {
             try
             {
+                if (ajandekArList.Sum() >= koltsegvetes)
+                {
+                    throw new Exception("Nem adható hozzá több ajándék, mivel átlépte a költségvetést.");
+                }
                 Console.Write("Add meg az ajándék nevét: ");
                 string bekeres = Console.ReadLine();
                 if (bekeres == "")
@@ -56,7 +99,6 @@
                 }
                 if (!ajandekNevList.Contains(bekeres))
                 {
-                    ajandekNevList.Add(bekeres);
                     try
                     {
                         Console.Write("Add meg az ajándék árát: ");
@@ -125,7 +167,7 @@
                 {
                     Console.WriteLine("Figyelem: Az elköltött összeg elérte a költségvetés 90%-át!");
                 }
-                if (ajandekArList.Sum() > koltsegvetes)
+                if (ajandekArList.Sum() >= koltsegvetes)
                 {
                     throw new Exception("Nem adható hozzá több ajándék, mivel átlépte a költségvetést.");
                 }
@@ -232,6 +274,32 @@
         }
         static void CategorizeGifts()
         {
+            if (ajandekNevList.Count == 0)
+            {
+                Console.WriteLine("Nincsenek ajándékok a listában.");
+                return;
+            }
+
+            var KategorizaltAjandekok = new Dictionary<string, List<string>>();
+
+            for (int i = 0; i < ajandekNevList.Count; i++)
+            {
+                string kategoria = ajandekKategoriaList[i];
+                string ajandek = ajandekNevList[i];
+
+                if (!KategorizaltAjandekok.ContainsKey(kategoria))
+                {
+                    KategorizaltAjandekok[kategoria] = new List<string>();
+                }
+
+                KategorizaltAjandekok[kategoria].Add(ajandek);
+            }
+
+            Console.WriteLine("Kategóriák szerint:");
+            foreach (var kategoria in KategorizaltAjandekok)
+            {
+                Console.WriteLine($"{kategoria.Key}: {string.Join(", ", kategoria.Value)}");
+            }
         }
     }
 }
